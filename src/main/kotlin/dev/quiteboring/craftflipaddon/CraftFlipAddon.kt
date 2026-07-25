@@ -1,18 +1,18 @@
-package com.example
+package dev.quiteboring.craftflipaddon
 
 import org.cobalt.addon.Addon
 import org.slf4j.LoggerFactory
 
-class ExampleAddon : Addon {
+class CraftFlipAddon : Addon {
 
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     override fun onLoad() {
-        logger.info("ExampleAddon Loaded!")
+        logger.info("Loaded!")
     }
 
     override fun onUnload() {
-        logger.info("ExampleAddon Unloaded!")
+        logger.info("Unloaded!")
     }
 
 }

@@ -27,7 +27,7 @@ dependencies {
     implementation("net.fabricmc:fabric-loader:${property("loader_version")}")
     implementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
     implementation("net.fabricmc.fabric-api:fabric-api:${property("fabric_api_version")}")
-    implementation("com.github.CobaltScripts:Cobalt:master-SNAPSHOT")
+    implementation("com.github.CobaltScripts:Cobalt:1.0.0.93d64cf")
 
     implementation("com.jagrosh:DiscordIPC:0.6.0-SNAPSHOT")
     runtimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.2")

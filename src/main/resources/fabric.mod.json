@@ -16,7 +16,7 @@
     "cobalt": [
       {
         "adapter": "kotlin",
-        "value": "com.example.ExampleAddon"
+        "value": "${base_group}.CraftFlipAddon"
       }
     ]
   },
