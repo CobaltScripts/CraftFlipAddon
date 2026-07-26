@@ -1,18 +1,33 @@
 package dev.quiteboring.craftflipaddon
 
+import com.google.gson.Gson
+import dev.quiteboring.craftflipaddon.api.BazaarData
+import dev.quiteboring.craftflipaddon.api.FlipFinder
+import dev.quiteboring.craftflipaddon.command.TestCommand
 import org.cobalt.addon.Addon
+import org.cobalt.command.CommandManager
+import org.cobalt.module.ModuleManager
+import org.cobalt.util.scheduling.Multithreading
 import org.slf4j.LoggerFactory
 
-class CraftFlipAddon : Addon {
+object CraftFlipAddon : Addon {
 
-    private val logger = LoggerFactory.getLogger(this::class.java)
+  private val logger = LoggerFactory.getLogger(this::class.java)
 
-    override fun onLoad() {
-        logger.info("Loaded!")
-    }
+  val gson = Gson()
 
-    override fun onUnload() {
-        logger.info("Unloaded!")
-    }
+  override fun onLoad() {
+    CommandManager.registerCommand(TestCommand)
+    ModuleManager.addModule(CraftFlipScript)
+
+    BazaarData.updateData()
+    FlipFinder.updateData()
+
+    logger.info("Loaded CraftFlipAddon!")
+  }
+
+  override fun onUnload() {
+    logger.info("Unloaded CraftFlipAddon!")
+  }
 
 }

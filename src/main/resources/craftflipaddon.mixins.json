@@ -4,10 +4,9 @@
   "package": "${base_group}.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "TitleScreenMixin"
+    "PlayerTabOverlayAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
   }
 }
-

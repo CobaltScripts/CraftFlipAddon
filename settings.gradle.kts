@@ -1,18 +1,18 @@
 pluginManagement {
-    repositories {
-        maven("https://maven.fabricmc.net/")
-        mavenCentral()
-        gradlePluginPortal()
-    }
+  repositories {
+    maven("https://maven.fabricmc.net/")
+    mavenCentral()
+    gradlePluginPortal()
+  }
 
-    val loom_version: String by settings
-    val fabric_kotlin_version: String by settings
+  val loom_version: String by settings
+  val fabric_kotlin_version: String by settings
 
-    plugins {
-        id("com.github.johnrengelman.shadow") version "8.1.1"
-        id("net.fabricmc.fabric-loom") version loom_version
-        id("org.jetbrains.kotlin.jvm") version fabric_kotlin_version.split("+kotlin.")[1].split("+")[0]
-    }
+  plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("net.fabricmc.fabric-loom") version loom_version
+    id("org.jetbrains.kotlin.jvm") version fabric_kotlin_version.split("+kotlin.")[1].split("+")[0]
+  }
 }
 
 rootProject.name = providers.gradleProperty("mod_name").get()

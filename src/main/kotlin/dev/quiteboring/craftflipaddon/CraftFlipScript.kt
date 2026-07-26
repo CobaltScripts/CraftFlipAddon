@@ -1,0 +1,139 @@
+package dev.quiteboring.craftflipaddon
+
+import dev.quiteboring.craftflipaddon.api.FlipFinder
+import dev.quiteboring.craftflipaddon.state.FindFlipState
+import dev.quiteboring.craftflipaddon.util.SkyblockUtils
+import dev.quiteboring.craftflipaddon.util.helper.BuffState
+import org.cobalt.event.annotation.SubscribeEvent
+import org.cobalt.event.impl.TickEvent
+import org.cobalt.event.impl.WorldEvent
+import org.cobalt.module.ModuleCategory
+import org.cobalt.module.impl.script.ScriptState
+import org.cobalt.module.type.Script
+import org.cobalt.ui.component.setting.impl.CheckboxSetting
+import org.cobalt.ui.component.setting.impl.ModeSetting
+import org.cobalt.ui.component.setting.impl.SliderSetting
+import org.cobalt.util.chat.ChatUtils
+import org.cobalt.util.chat.MessageType
+import org.cobalt.util.scheduling.Clock
+
+object CraftFlipScript : Script(
+  name = "CraftFlip",
+  category = ModuleCategory.MISC,
+  backgroundResourcePath = "/assets/craftflipaddon/script.png"
+) {
+
+  val minMargin by SliderSetting(
+    name = "Min Margin",
+    description = "Min margin in thousands",
+    min = 4,
+    max = 2000,
+    defaultValue = 4
+  )
+
+  val maxCraftCost by SliderSetting(
+    name = "Max Craft Cost",
+    description = "Max craft cost in thousands",
+    min = 0,
+    max = 2000,
+    defaultValue = 500
+  )
+
+  val maxCoinsPerHour by SliderSetting(
+    name = "Max Coins Per Hour",
+    description = "Max coins per hour in millions",
+    min = 1,
+    max = 200,
+    defaultValue = 25
+  )
+
+  val instaSellProduct by CheckboxSetting(
+    name = "Instasell Product",
+    description = "Instasell final product to bazaar",
+    defaultValue = false
+  )
+
+  val sortMode by ModeSetting(
+    name = "Sort Mode",
+    description = "How to sort flips",
+    defaultValue = 0,
+    options = arrayOf("Coins Per Hour", "Margin", "Mix")
+  )
+
+  val updateFlipsInterval by SliderSetting(
+    name = "Update Flips Interval",
+    description = "Updates best flips every x amount of minutes",
+    min = 1,
+    max = 60,
+    defaultValue = 20
+  )
+
+  val updateBazaarDataInterval by SliderSetting(
+    name = "Update Bazaar Data Interval",
+    description = "Updates bazaar data every x amount of minutes",
+    min = 1,
+    max = 60,
+    defaultValue = 60 // don't change so no-names genuinely won't make anything
+  )
+
+  var state: ScriptState? = null
+  val globalDelay = Clock()
+
+  var chosenFlip: FlipFinder.FlipProduct? = null
+  val blacklistedFlips = mutableSetOf<String>()
+
+  override fun onEnable() {
+    if (SkyblockUtils.cookieBuffState != BuffState.ACTIVE) {
+      ChatUtils.sendSystemMessage("<red>You need a booster cookie in order to use this macro.</red>")
+      return
+    }
+
+    chosenFlip = null
+    globalDelay.schedule(1000)
+    changeState(FindFlipState())
+
+    super.onEnable()
+  }
+
+  override fun onDisable() {
+    changeState(null)
+    chosenFlip = null
+    super.onDisable()
+  }
+
+  @SubscribeEvent
+  fun onTick(ignored: TickEvent.Start) {
+    if (!enabled) {
+      return
+    }
+
+    if (minecraft.level == null || minecraft.player == null) {
+      return
+    }
+
+    if (!globalDelay.passed()) {
+      return
+    }
+
+    state?.onTick()
+  }
+
+  @SubscribeEvent
+  fun onRender(ignored: WorldEvent.GizmoRender) {
+    if (!enabled) {
+      return
+    }
+
+    state?.onRender()
+  }
+
+  fun changeState(newState: ScriptState?) {
+    state?.exit()
+
+    newState?.enter()
+    state = newState
+
+    ChatUtils.sendSystemMessage("Current State: ${state?.javaClass?.simpleName}", MessageType.DEBUG)
+  }
+
+}

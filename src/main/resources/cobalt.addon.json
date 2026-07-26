@@ -2,6 +2,10 @@
   "id": "${mod_id}",
   "name": "${mod_name}",
   "version": "1.0.0",
-  "entrypoints": ["${base_group}.CraftFlipAddon"],
-  "mixins": ["${mod_id}.mixins.json"]
+  "entrypoints": [
+    "${base_group}.CraftFlipAddon"
+  ],
+  "mixins": [
+    "${mod_id}.mixins.json"
+  ]
 }

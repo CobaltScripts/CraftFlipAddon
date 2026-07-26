@@ -4,7 +4,9 @@
   "version": "${mod_version}",
   "name": "Example Addon",
   "description": "",
-  "authors": ["Me!"],
+  "authors": [
+    "Me!"
+  ],
   "contact": {
     "homepage": "https://fabricmc.net/",
     "sources": "https://github.com/FabricMC/fabric-example-mod"
