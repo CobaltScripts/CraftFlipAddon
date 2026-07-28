@@ -3,8 +3,16 @@ package dev.quiteboring.craftflipaddon.util
 import dev.quiteboring.craftflipaddon.mixins.PlayerTabOverlayAccessor
 import dev.quiteboring.craftflipaddon.util.helper.BuffState
 import net.minecraft.client.Minecraft
+import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
+import org.cobalt.event.EventBus
+import org.cobalt.event.annotation.SubscribeEvent
+import org.cobalt.event.impl.PacketEvent
+import org.cobalt.event.impl.WorldEvent
 
 object SkyblockUtils {
+
+  var isInSkyblock: Boolean = false
+    private set
 
   val cookieBuffState: BuffState
     get() {
@@ -27,5 +35,28 @@ object SkyblockUtils {
         else -> BuffState.ACTIVE
       }
     }
+
+  init {
+    EventBus.register(this)
+  }
+
+  @SubscribeEvent
+  fun onPacketReceive(event: PacketEvent.Receive) {
+    val packet = event.packet
+
+    if (packet !is ClientboundSetObjectivePacket) {
+      return
+    }
+
+    if (!isInSkyblock) {
+      val objName = packet.objectiveName
+      isInSkyblock = objName == "SBScoreboard"
+    }
+  }
+
+  @SubscribeEvent
+  fun onWorldChange(event: WorldEvent.Change) {
+    isInSkyblock = false
+  }
 
 }

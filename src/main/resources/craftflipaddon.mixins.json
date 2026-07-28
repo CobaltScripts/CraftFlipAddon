@@ -4,7 +4,8 @@
   "package": "${base_group}.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "PlayerTabOverlayAccessor"
+    "PlayerTabOverlayAccessor",
+    "AbstractSignEditScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -9,6 +9,7 @@ object TestCommand : Command("cftest") {
 
   @DefaultHandler
   fun main() {
+    ChatUtils.sendSystemMessage("In Skyblock?: ${SkyblockUtils.isInSkyblock}")
     ChatUtils.sendSystemMessage("Booster Cookie Buff State: ${SkyblockUtils.cookieBuffState}")
   }
 

@@ -4,11 +4,15 @@ import dev.quiteboring.craftflipaddon.CraftFlipScript
 import dev.quiteboring.craftflipaddon.api.BazaarData
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.inventory.ContainerInput
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.Items
 import org.cobalt.module.impl.script.ScriptState
 import org.cobalt.util.chat.ChatUtils
+import org.cobalt.util.chat.MessageType
 import org.cobalt.util.client.PlayerUtils
 import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
+import org.cobalt.util.inventory.ItemUtils
 import org.slf4j.LoggerFactory
 
 class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptState() {
@@ -81,9 +85,19 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
             return
           }
 
-          recipe[id] = itemStack.count
+          recipe[id] = (recipe[id] ?: 0) + itemStack.count
         }
 
+        val craftSlot = InventoryUtils.findItemInContainer(Items.GOLDEN_PICKAXE)
+        val loreLines = ItemUtils.getLoreLines(menu.slots[craftSlot].item)
+
+        if (loreLines.any { it.string.contains("Recipe not unlocked!", ignoreCase = true) }) {
+          CraftFlipScript.globalDelay.schedule(700)
+          currState = State.INVOKE_REFIND
+          return
+        }
+
+        CraftFlipScript.globalDelay.schedule(1000)
         currState = State.START_BUY_ORDER
       }
 
@@ -97,6 +111,8 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
       State.START_BUY_ORDER -> {
         PlayerUtils.closeScreen()
         CraftFlipScript.globalDelay.schedule(1000)
+
+        ChatUtils.sendSystemMessage("Chosen Flip: ${bazaarProduct.productId}", MessageType.DEBUG)
         CraftFlipScript.changeState(BuyOrderState(recipe))
       }
     }

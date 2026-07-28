@@ -14,12 +14,6 @@ class FindFlipState : ScriptState() {
   }
 
   override fun onTick() {
-    if (minecraft.gui.screen() != null) {
-      PlayerUtils.closeScreen()
-      CraftFlipScript.globalDelay.schedule(Random.nextLong(500, 800))
-      return
-    }
-
     val flip = CraftFlipScript.chosenFlip
 
     if (flip == null) {

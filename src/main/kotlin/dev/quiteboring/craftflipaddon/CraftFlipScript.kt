@@ -11,6 +11,7 @@ import org.cobalt.module.ModuleCategory
 import org.cobalt.module.impl.script.ScriptState
 import org.cobalt.module.type.Script
 import org.cobalt.ui.component.setting.impl.CheckboxSetting
+import org.cobalt.ui.component.setting.impl.InfoSetting
 import org.cobalt.ui.component.setting.impl.ModeSetting
 import org.cobalt.ui.component.setting.impl.SliderSetting
 import org.cobalt.util.chat.ChatUtils
@@ -23,6 +24,10 @@ object CraftFlipScript : Script(
   backgroundResourcePath = "/assets/craftflipaddon/script.png"
 ) {
 
+  val ignored by InfoSetting(
+    text = "You need a Hypixel rank in order to use!",
+    type = InfoSetting.Type.ERROR
+  )
   val minMargin by SliderSetting(
     name = "Min Margin",
     description = "Min margin in thousands",
@@ -119,7 +124,7 @@ object CraftFlipScript : Script(
   }
 
   @SubscribeEvent
-  fun onRender(ignored: WorldEvent.GizmoRender) {
+  fun onRender(ignored: WorldEvent.BeforeGizmos) {
     if (!enabled) {
       return
     }
