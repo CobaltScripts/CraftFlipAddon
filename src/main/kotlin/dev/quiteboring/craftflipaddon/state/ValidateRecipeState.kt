@@ -2,6 +2,7 @@ package dev.quiteboring.craftflipaddon.state
 
 import dev.quiteboring.craftflipaddon.CraftFlipScript
 import dev.quiteboring.craftflipaddon.api.BazaarData
+import kotlin.times
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.item.Item
@@ -111,11 +112,42 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
       State.START_BUY_ORDER -> {
         PlayerUtils.closeScreen()
         CraftFlipScript.globalDelay.schedule(1000)
-
         ChatUtils.sendSystemMessage("Chosen Flip: ${bazaarProduct.productId}", MessageType.DEBUG)
-        CraftFlipScript.changeState(BuyOrderState(recipe))
+        CraftFlipScript.changeState(BuyOrderState(genBuyAmounts()))
       }
     }
+  }
+
+  private fun genBuyAmounts(): Map<String, Int> {
+    val buyAmounts = mutableMapOf<String, Int>()
+    val inventorySpace = calculateInventorySpace()
+    val totalPerCraft = recipe.values.sum()
+
+    if (totalPerCraft == 0) {
+      return emptyMap()
+    }
+
+    val maxCrafts = inventorySpace / totalPerCraft
+
+    for ((ingredient, count) in recipe) {
+      buyAmounts[ingredient] = count * maxCrafts
+    }
+
+    return buyAmounts
+  }
+
+  private fun calculateInventorySpace(): Int {
+    val player = minecraft.player ?: return 0
+    val menu = player.containerMenu
+    var emptySlots = 0
+
+    for (i in 0 until 36) {
+      if (menu.slots[i].item.isEmpty) {
+        emptySlots++
+      }
+    }
+
+    return emptySlots * 64
   }
 
   enum class State {

@@ -4,26 +4,9 @@ import org.cobalt.module.impl.script.ScriptState
 import org.cobalt.util.chat.ChatUtils
 import org.cobalt.util.chat.MessageType
 
-class BuyOrderState(val recipe: Map<String, Int>) : ScriptState() {
-
-  private val buyAmounts = mutableMapOf<String, Int>()
+class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
 
   override fun enter() {
-    val inventorySpace = calculateInventorySpace()
-    val totalPerCraft = recipe.values.sum()
-
-    if (totalPerCraft == 0) {
-      return
-    }
-
-    val maxCrafts = inventorySpace / totalPerCraft
-
-    buyAmounts.clear()
-
-    for ((ingredient, count) in recipe) {
-      buyAmounts[ingredient] = count * maxCrafts
-    }
-
     ChatUtils.sendSystemMessage("Buy Amounts: $buyAmounts", MessageType.DEBUG)
   }
 
