@@ -7,7 +7,7 @@ import dev.quiteboring.craftflipaddon.util.WebUtils
 import org.cobalt.util.scheduling.Multithreading
 import org.slf4j.LoggerFactory
 
-object FlipFinder {
+object FlipData {
 
   private val logger = LoggerFactory.getLogger(this::class.java)
   private var lastUpdate = 0L
@@ -44,6 +44,15 @@ object FlipFinder {
       2 -> filtered.maxByOrNull { it.margin * coinsMetric(it) }
       else -> filtered.maxByOrNull { coinsMetric(it) }
     }
+  }
+
+  fun findProduct(productId: String): FlipProduct? {
+    return products.firstOrNull { it.id == productId }
+  }
+
+  fun findItemName(productId: String): String {
+    return products.firstOrNull { it.id == productId }?.name
+      ?: productId.replace("_", " ").lowercase()
   }
 
   fun updateData(force: Boolean = false) {

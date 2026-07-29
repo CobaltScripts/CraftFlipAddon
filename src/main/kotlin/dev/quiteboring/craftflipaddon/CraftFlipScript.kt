@@ -1,9 +1,10 @@
 package dev.quiteboring.craftflipaddon
 
-import dev.quiteboring.craftflipaddon.api.FlipFinder
-import dev.quiteboring.craftflipaddon.state.FindFlipState
+import dev.quiteboring.craftflipaddon.api.FlipData
+import dev.quiteboring.craftflipaddon.state.find.FindFlipState
 import dev.quiteboring.craftflipaddon.util.SkyblockUtils
 import dev.quiteboring.craftflipaddon.util.helper.BuffState
+import kotlin.random.Random
 import org.cobalt.event.annotation.SubscribeEvent
 import org.cobalt.event.impl.TickEvent
 import org.cobalt.event.impl.WorldEvent
@@ -84,7 +85,7 @@ object CraftFlipScript : Script(
   var state: ScriptState? = null
   val globalDelay = Clock()
 
-  var chosenFlip: FlipFinder.FlipProduct? = null
+  var chosenFlip: FlipData.FlipProduct? = null
   val blacklistedFlips = mutableSetOf<String>()
 
   override fun onEnable() {
@@ -139,6 +140,10 @@ object CraftFlipScript : Script(
     state = newState
 
     ChatUtils.sendSystemMessage("Current State: ${state?.javaClass?.simpleName}", MessageType.DEBUG)
+  }
+
+  fun genDelay(): Long {
+    return Random.nextLong(500L, 700L)
   }
 
 }

@@ -1,24 +1,26 @@
-package dev.quiteboring.craftflipaddon.state
+package dev.quiteboring.craftflipaddon.state.find
 
 import dev.quiteboring.craftflipaddon.CraftFlipScript
 import dev.quiteboring.craftflipaddon.api.BazaarData
-import dev.quiteboring.craftflipaddon.api.FlipFinder
-import kotlin.random.Random
+import dev.quiteboring.craftflipaddon.api.FlipData
 import org.cobalt.module.impl.script.ScriptState
-import org.cobalt.util.client.PlayerUtils
 
 class FindFlipState : ScriptState() {
 
   override fun enter() {
-    CraftFlipScript.chosenFlip = FlipFinder.findFlip()
+    CraftFlipScript.chosenFlip = FlipData.findFlip()
   }
 
   override fun onTick() {
+    if (minecraft.player == null) {
+      return
+    }
+
     val flip = CraftFlipScript.chosenFlip
 
     if (flip == null) {
-      CraftFlipScript.chosenFlip = FlipFinder.findFlip(true)
-      CraftFlipScript.globalDelay.schedule(1000)
+      CraftFlipScript.chosenFlip = FlipData.findFlip(true)
+      CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
       return
     }
 

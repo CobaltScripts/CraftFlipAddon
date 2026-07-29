@@ -1,12 +1,11 @@
-package dev.quiteboring.craftflipaddon.state
+package dev.quiteboring.craftflipaddon.state.find
 
 import dev.quiteboring.craftflipaddon.CraftFlipScript
 import dev.quiteboring.craftflipaddon.api.BazaarData
-import kotlin.times
+import dev.quiteboring.craftflipaddon.api.FlipData
+import dev.quiteboring.craftflipaddon.state.buy.BuyOrderState
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.inventory.ContainerInput
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.Items
 import org.cobalt.module.impl.script.ScriptState
 import org.cobalt.util.chat.ChatUtils
 import org.cobalt.util.chat.MessageType
@@ -14,19 +13,18 @@ import org.cobalt.util.client.PlayerUtils
 import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.inventory.ItemUtils
-import org.slf4j.LoggerFactory
+import kotlin.collections.iterator
 
 class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptState() {
 
   private var currState = State.OPEN_RECIPE
-  private val search = bazaarProduct.productId
-    .replace("_", " ")
+  private val search = FlipData.findItemName(bazaarProduct.productId)
     .lowercase()
 
   private val recipe = mutableMapOf<String, Int>()
 
   override fun onTick() {
-    if (minecraft.level == null) {
+    if (minecraft.player == null) {
       return
     }
 
@@ -44,7 +42,7 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
           return
         }
 
-        CraftFlipScript.globalDelay.schedule(700)
+        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
         currState = State.CLICK_PRODUCT
       }
 
@@ -68,6 +66,15 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
 
         val menu = player.containerMenu
 
+        val craftSlot = InventoryUtils.findItemInContainer("Supercraft")
+        val loreLines = ItemUtils.getLoreLines(menu.slots[craftSlot].item)
+
+        if (loreLines.any { it.string.contains("Recipe not unlocked!", ignoreCase = true) }) {
+          CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+          currState = State.INVOKE_REFIND
+          return
+        }
+
         for (slotIndex in craftSlots) {
           val itemStack = menu.slots[slotIndex].item
 
@@ -81,7 +88,7 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
             ?.get()
 
           if (id == null || BazaarData.getProduct(id) == null) {
-            CraftFlipScript.globalDelay.schedule(700)
+            CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
             currState = State.INVOKE_REFIND
             return
           }
@@ -89,29 +96,20 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
           recipe[id] = (recipe[id] ?: 0) + itemStack.count
         }
 
-        val craftSlot = InventoryUtils.findItemInContainer(Items.GOLDEN_PICKAXE)
-        val loreLines = ItemUtils.getLoreLines(menu.slots[craftSlot].item)
-
-        if (loreLines.any { it.string.contains("Recipe not unlocked!", ignoreCase = true) }) {
-          CraftFlipScript.globalDelay.schedule(700)
-          currState = State.INVOKE_REFIND
-          return
-        }
-
-        CraftFlipScript.globalDelay.schedule(1000)
+        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
         currState = State.START_BUY_ORDER
       }
 
       State.INVOKE_REFIND -> {
         PlayerUtils.closeScreen()
         CraftFlipScript.blacklistedFlips.add(bazaarProduct.productId)
-        CraftFlipScript.globalDelay.schedule(1000)
+        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
         CraftFlipScript.changeState(FindFlipState())
       }
 
       State.START_BUY_ORDER -> {
         PlayerUtils.closeScreen()
-        CraftFlipScript.globalDelay.schedule(1000)
+        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
         ChatUtils.sendSystemMessage("Chosen Flip: ${bazaarProduct.productId}", MessageType.DEBUG)
         CraftFlipScript.changeState(BuyOrderState(genBuyAmounts()))
       }
