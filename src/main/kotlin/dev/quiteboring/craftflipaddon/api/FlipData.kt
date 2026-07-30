@@ -50,11 +50,6 @@ object FlipData {
     return products.firstOrNull { it.id == productId }
   }
 
-  fun findItemName(productId: String): String {
-    return products.firstOrNull { it.id == productId }?.name
-      ?: productId.replace("_", " ").lowercase()
-  }
-
   fun updateData(force: Boolean = false) {
     if (!force && System.currentTimeMillis() - lastUpdate < CraftFlipScript.updateFlipsInterval) {
       return

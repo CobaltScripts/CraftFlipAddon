@@ -11,12 +11,21 @@ import org.cobalt.util.chat.ChatUtils
 import org.cobalt.util.chat.MessageType
 import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
+import org.cobalt.util.inventory.ItemUtils
+import dev.quiteboring.craftflipaddon.util.helper.ItemOrder
 
-class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
+class BuyOrderState(
+  val flip: FlipData.FlipProduct,
+  val buyAmounts: Map<String, Int>
+) : ScriptState() {
 
   private val items = buyAmounts.keys.toList()
-  private var itemIndex = 0
+
   private var currState = State.OPEN_BAZAAR
+  private var itemIndex = 0
+  private var unitPrice = 0.0
+
+  private val orderedItems = mutableListOf<ItemOrder>()
 
   override fun enter() {
     if (buyAmounts.isEmpty() || buyAmounts.values.any { it == 0 }) {
@@ -29,34 +38,21 @@ class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
   }
 
   override fun onTick() {
-    if (minecraft.player == null) {
-      return
-    }
-
+    val player = minecraft.player ?: return
     val screen = minecraft.gui.screen()
 
     when (currState) {
       State.OPEN_BAZAAR -> {
-        val item = items[itemIndex]
-        val itemName = FlipData.findItemName(item)
+        val itemName = items[itemIndex].split(":")[1].lowercase()
 
         ChatUtils.sendCommand("bz $itemName")
-        currState = State.VERIFY_OPEN_BAZAAR
-      }
-
-      State.VERIFY_OPEN_BAZAAR -> {
-        if (screen == null) {
-          return
-        }
-
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
         currState = State.CLICK_ITEM
       }
 
       State.CLICK_ITEM -> {
-        val item = items[itemIndex]
-        val itemName = FlipData.findItemName(item).lowercase()
-        val slot = InventoryUtils.findItemInContainer(itemName)
+        val itemName = items[itemIndex].split(":")[1]
+        val slot = InventoryUtils.findItemInContainer("[$itemName]", true)
 
         if (slot == -1) {
           return
@@ -117,6 +113,15 @@ class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
           return
         }
 
+        val stack = player.containerMenu.getSlot(slot).item
+        val loreLines = ItemUtils.getLoreLines(stack)
+
+        unitPrice = loreLines.firstNotNullOfOrNull { line ->
+          regex.find(line.string)?.groupValues?.get(1)?.replace(",", "")?.toDoubleOrNull()
+        } ?: return
+
+        ChatUtils.sendSystemMessage("Unit Price: $unitPrice", MessageType.DEBUG)
+
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
         currState = State.FINISH_BUY_ORDER
@@ -131,6 +136,9 @@ class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+
+        val name = items[itemIndex].split(":")[1]
+        orderedItems += ItemOrder(name, items[itemIndex], buyAmounts[items[itemIndex]] ?: 0, unitPrice)
         currState = State.NEXT_ITEM
       }
 
@@ -142,7 +150,7 @@ class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
         itemIndex++
 
         if (itemIndex >= items.size) {
-          CraftFlipScript.changeState(ClaimItemState())
+          CraftFlipScript.changeState(ClaimItemState(flip, orderedItems))
           return
         }
 
@@ -154,7 +162,6 @@ class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
 
   enum class State {
     OPEN_BAZAAR,
-    VERIFY_OPEN_BAZAAR,
     CLICK_ITEM,
     CLICK_BUY_ORDER,
     CLICK_CUSTOM_AMOUNT,
@@ -163,6 +170,13 @@ class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
     CLICK_TOP_ORDER,
     FINISH_BUY_ORDER,
     NEXT_ITEM
+  }
+
+  companion object {
+    private val regex = Regex(
+      """Unit price:\s*([\d,]+(?:\.\d+)?)\s*coins""",
+      RegexOption.IGNORE_CASE
+    )
   }
 
 }

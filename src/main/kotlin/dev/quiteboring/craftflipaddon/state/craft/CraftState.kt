@@ -11,10 +11,7 @@ import org.cobalt.util.chat.ChatUtils
 import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 
-class CraftState(
-  val flip: FlipData.FlipProduct,
-  val amountToCraft: Int
-) : ScriptState() {
+class CraftState(val flip: FlipData.FlipProduct) : ScriptState() {
 
   private val flipName = flip.name
   private var currState = State.SEND_COMMAND
@@ -34,7 +31,7 @@ class CraftState(
       }
 
       State.CLICK_ITEM -> {
-        val slot = InventoryUtils.findItemInContainer(flipName)
+        val slot = InventoryUtils.findItemInContainer("[$flipName]", true)
 
         if (slot == -1) {
           return
@@ -62,7 +59,8 @@ class CraftState(
           return
         }
 
-        (screen as IAbstractSignEditScreen).`craftflipaddon$setFirstMessage`(amountToCraft.toString())
+        val amount = CraftFlipScript.amountToCraft.toString()
+        (screen as IAbstractSignEditScreen).`craftflipaddon$setFirstMessage`(amount)
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
         currState = State.EXIT_SIGN
       }

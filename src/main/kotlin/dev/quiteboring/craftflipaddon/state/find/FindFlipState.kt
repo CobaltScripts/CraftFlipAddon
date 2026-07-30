@@ -8,7 +8,7 @@ import org.cobalt.module.impl.script.ScriptState
 class FindFlipState : ScriptState() {
 
   override fun enter() {
-    CraftFlipScript.chosenFlip = FlipData.findFlip()
+    CraftFlipScript.chosenFlip = FlipData.findProduct("ENCHANTED_NETHER_STALK") // TODO: change back to FlipData.findFlip()
   }
 
   override fun onTick() {
@@ -24,8 +24,11 @@ class FindFlipState : ScriptState() {
       return
     }
 
-    val bazaarProduct = BazaarData.getProduct(flip.id) ?: return
-    CraftFlipScript.changeState(ValidateRecipeState(bazaarProduct))
+    if (BazaarData.getProduct(flip.id) == null) {
+      return
+    }
+
+    CraftFlipScript.changeState(ValidateRecipeState(flip))
   }
 
 }

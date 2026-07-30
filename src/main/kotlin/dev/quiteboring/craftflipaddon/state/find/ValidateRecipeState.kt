@@ -4,6 +4,7 @@ import dev.quiteboring.craftflipaddon.CraftFlipScript
 import dev.quiteboring.craftflipaddon.api.BazaarData
 import dev.quiteboring.craftflipaddon.api.FlipData
 import dev.quiteboring.craftflipaddon.state.buy.BuyOrderState
+import dev.quiteboring.craftflipaddon.util.SearchUtils
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.inventory.ContainerInput
 import org.cobalt.module.impl.script.ScriptState
@@ -15,12 +16,9 @@ import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.inventory.ItemUtils
 import kotlin.collections.iterator
 
-class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptState() {
+class ValidateRecipeState(val flip: FlipData.FlipProduct) : ScriptState() {
 
   private var currState = State.OPEN_RECIPE
-  private val search = FlipData.findItemName(bazaarProduct.productId)
-    .lowercase()
-
   private val recipe = mutableMapOf<String, Int>()
 
   override fun onTick() {
@@ -33,7 +31,7 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
 
     when (currState) {
       State.OPEN_RECIPE -> {
-        ChatUtils.sendCommand("recipe $search")
+        ChatUtils.sendCommand("recipe ${flip.name.lowercase()}")
         currState = State.VERIFY_OPEN_GUI
       }
 
@@ -47,7 +45,7 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
       }
 
       State.CLICK_PRODUCT -> {
-        val itemSlot = InventoryUtils.findItemInContainer(search)
+        val itemSlot = InventoryUtils.findItemInContainer("[${flip.name}]", true)
 
         if (itemSlot == -1) {
           return
@@ -58,9 +56,9 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
       }
 
       State.VALIDATE_CRAFT -> {
-        val invTitle = screen?.title?.string.orEmpty().lowercase()
+        val invTitle = screen?.title?.string.orEmpty()
 
-        if (!invTitle.startsWith(search)) {
+        if (!invTitle.startsWith(flip.name, ignoreCase = true)) {
           return
         }
 
@@ -82,10 +80,7 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
             continue
           }
 
-          val id = itemStack.get(DataComponents.CUSTOM_DATA)
-            ?.copyTag()
-            ?.getString("id")
-            ?.get()
+          val id = SearchUtils.getProductId(itemStack)
 
           if (id == null || BazaarData.getProduct(id) == null) {
             CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
@@ -93,7 +88,10 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
             return
           }
 
-          recipe[id] = (recipe[id] ?: 0) + itemStack.count
+          val name = itemStack.displayName.string.replace(Regex("[\\[\\]]"), "")
+          val key = "$id:$name"
+
+          recipe[key] = (recipe[key] ?: 0) + itemStack.count
         }
 
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
@@ -102,7 +100,7 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
 
       State.INVOKE_REFIND -> {
         PlayerUtils.closeScreen()
-        CraftFlipScript.blacklistedFlips.add(bazaarProduct.productId)
+        CraftFlipScript.blacklistedFlips.add(flip.id)
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
         CraftFlipScript.changeState(FindFlipState())
       }
@@ -110,8 +108,8 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
       State.START_BUY_ORDER -> {
         PlayerUtils.closeScreen()
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
-        ChatUtils.sendSystemMessage("Chosen Flip: ${bazaarProduct.productId}", MessageType.DEBUG)
-        CraftFlipScript.changeState(BuyOrderState(genBuyAmounts()))
+        ChatUtils.sendSystemMessage("Chosen Flip: ${flip.id}", MessageType.DEBUG)
+        CraftFlipScript.changeState(BuyOrderState(flip, genBuyAmounts()))
       }
     }
   }
@@ -126,6 +124,7 @@ class ValidateRecipeState(val bazaarProduct: BazaarData.BazaarProduct) : ScriptS
     }
 
     val maxCrafts = inventorySpace / totalPerCraft
+    CraftFlipScript.amountToCraft = maxCrafts
 
     for ((ingredient, count) in recipe) {
       buyAmounts[ingredient] = count * maxCrafts
