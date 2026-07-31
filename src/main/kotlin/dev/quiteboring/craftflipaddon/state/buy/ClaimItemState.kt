@@ -26,7 +26,7 @@ class ClaimItemState(
   private val relistDelay = Clock()
 
   override fun enter() {
-    relistDelay.schedule(15_000)
+    relistDelay.schedule(5_000)
   }
 
   override fun onTick() {
@@ -89,17 +89,20 @@ class ClaimItemState(
         scheduledItemsToClaim.remove(item)
         CraftFlipScript.orderedItems.removeAll { it.name == item.name }
 
-        if (CraftFlipScript.orderedItems.isEmpty()) {
+        PlayerUtils.closeScreen()
+        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+
+        if (scheduledItemsToClaim.isEmpty()) {
           CraftFlipScript.changeState(CraftState(flip))
-        } else if (scheduledItemsToClaim.isEmpty()) {
-          currState = State.CLOSE_SCREEN
+        } else {
+          currState = State.WAITING
         }
       }
 
       State.CLOSE_SCREEN -> {
         PlayerUtils.closeScreen()
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
-        currState = State.WAITING
+        CraftFlipScript.changeState(CraftState(flip))
       }
     }
   }

@@ -143,7 +143,7 @@ class BuyOrderState(
         val id = items[itemIndex].split(":")[0]
         val name = items[itemIndex].split(":")[1]
 
-        CraftFlipScript.orderedItems += ItemOrder(id, name, buyAmounts[items[itemIndex]] ?: 0, unitPrice)
+        CraftFlipScript.orderedItems += ItemOrder(name, id, buyAmounts[items[itemIndex]] ?: 0, unitPrice)
         currState = State.NEXT_ITEM
       }
 
