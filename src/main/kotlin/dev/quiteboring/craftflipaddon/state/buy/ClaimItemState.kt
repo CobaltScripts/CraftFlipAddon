@@ -4,24 +4,30 @@ import dev.quiteboring.craftflipaddon.CraftFlipScript
 import dev.quiteboring.craftflipaddon.api.BazaarData
 import dev.quiteboring.craftflipaddon.api.FlipData
 import dev.quiteboring.craftflipaddon.state.craft.CraftState
-import dev.quiteboring.craftflipaddon.util.helper.ItemOrder
 import dev.quiteboring.craftflipaddon.util.helper.OrderMode
 import net.minecraft.ChatFormatting
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 import net.minecraft.world.inventory.ContainerInput
+import org.cobalt.module.ModuleManager
 import org.cobalt.module.impl.script.ScriptState
 import org.cobalt.util.chat.ChatUtils
+import org.cobalt.util.client.PlayerUtils
 import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
+import org.cobalt.util.scheduling.Clock
 
 class ClaimItemState(
-  val flip: FlipData.FlipProduct,
-  val orderedItems: MutableList<ItemOrder>
+  val flip: FlipData.FlipProduct
 ) : ScriptState() {
 
   private var currState = State.WAITING
   private val scheduledItemsToClaim = mutableListOf<ClaimItem>()
+  private val relistDelay = Clock()
+
+  override fun enter() {
+    relistDelay.schedule(15_000)
+  }
 
   override fun onTick() {
     if (minecraft.player == null) {
@@ -35,25 +41,29 @@ class ClaimItemState(
           return
         }
 
-//        val outdatedItem = orderedItems.firstOrNull { item ->
-//          BazaarData.isOutdatedList(item.id, item.unitPrice, OrderMode.BUY_ORDER)
-//        }
-//
-//        if (outdatedItem == null) {
-//          return
-//        }
-//
-//        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
-//        CraftFlipScript.changeState(RelistBuyState(flip, orderedItems, outdatedItem))
+        if (!relistDelay.passed()) {
+          return
+        }
+
+        val outdatedItem = CraftFlipScript.orderedItems.firstOrNull { item ->
+          BazaarData.isOutdatedList(item.id, item.unitPrice, OrderMode.BUY_ORDER)
+        }
+
+        if (outdatedItem == null) {
+          return
+        }
+
+        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.changeState(RelistBuyState(flip, outdatedItem))
       }
 
       State.OPEN_BAZAAR -> {
         ChatUtils.sendCommand("bz")
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
-        currState = State.CLICK_BOOK
+        currState = State.CLICK_MANAGE_ORDERS
       }
 
-      State.CLICK_BOOK -> {
+      State.CLICK_MANAGE_ORDERS -> {
         val slot = InventoryUtils.findItemInContainer("Manage Orders")
 
         if (slot == -1) {
@@ -67,7 +77,7 @@ class ClaimItemState(
 
       State.CLAIM_ITEM -> {
         val itemAndSlot = scheduledItemsToClaim.firstNotNullOfOrNull { item ->
-          val slot = InventoryUtils.findItemInContainer("BUY ${item.name}", true)
+          val slot = InventoryUtils.findItemInContainer("[BUY ${item.name}]", true)
           if (slot != -1) item to slot else null
         } ?: return
 
@@ -77,13 +87,19 @@ class ClaimItemState(
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
 
         scheduledItemsToClaim.remove(item)
-        orderedItems.removeAll { it.name == item.name }
+        CraftFlipScript.orderedItems.removeAll { it.name == item.name }
 
-        if (orderedItems.isEmpty()) {
+        if (CraftFlipScript.orderedItems.isEmpty()) {
           CraftFlipScript.changeState(CraftState(flip))
         } else if (scheduledItemsToClaim.isEmpty()) {
-          currState = State.WAITING
+          currState = State.CLOSE_SCREEN
         }
+      }
+
+      State.CLOSE_SCREEN -> {
+        PlayerUtils.closeScreen()
+        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        currState = State.WAITING
       }
     }
   }
@@ -107,8 +123,9 @@ class ClaimItemState(
     WAITING,
 
     OPEN_BAZAAR,
-    CLICK_BOOK,
+    CLICK_MANAGE_ORDERS,
     CLAIM_ITEM,
+    CLOSE_SCREEN
   }
 
   data class ClaimItem(val name: String, val quantity: Int)

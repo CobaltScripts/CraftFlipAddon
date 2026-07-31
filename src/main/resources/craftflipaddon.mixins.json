@@ -4,8 +4,9 @@
   "package": "dev.quiteboring.craftflipaddon.mixins",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "PlayerTabOverlayAccessor",
-    "AbstractSignEditScreenMixin"
+    "AbstractContainerScreenMixin",
+    "AbstractSignEditScreenMixin",
+    "PlayerTabOverlayAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

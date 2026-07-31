@@ -22,13 +22,13 @@ object BazaarData {
   fun isOutdatedList(productId: String, price: Double, orderMode: OrderMode): Boolean {
     updateData()
 
-    val product = getProduct(productId) ?: return true
+    val product = getProduct(productId) ?: return false
 
     val topPrice = when (orderMode) {
-      OrderMode.BUY_ORDER -> product.buySummary.firstOrNull()?.pricePerUnit
+      OrderMode.BUY_ORDER -> product.buySummary.maxOfOrNull { it.pricePerUnit }
         ?: return false
 
-      OrderMode.SELL_ORDER -> product.sellSummary.firstOrNull()?.pricePerUnit
+      OrderMode.SELL_ORDER -> product.sellSummary.minOfOrNull { it.pricePerUnit }
         ?: return false
     }
 

@@ -25,12 +25,15 @@ class BuyOrderState(
   private var itemIndex = 0
   private var unitPrice = 0.0
 
-  private val orderedItems = mutableListOf<ItemOrder>()
-
   override fun enter() {
-    if (buyAmounts.isEmpty() || buyAmounts.values.any { it == 0 }) {
+    if (buyAmounts.values.any { it == 0 }) {
       ChatUtils.sendSystemMessage("<red>Not enough inventory space to craft..</red>")
       ModuleManager.stopScript()
+      return
+    }
+
+    if (items.isEmpty()) {
+      CraftFlipScript.changeState(ClaimItemState(flip))
       return
     }
 
@@ -137,8 +140,10 @@ class BuyOrderState(
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
         CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
 
+        val id = items[itemIndex].split(":")[0]
         val name = items[itemIndex].split(":")[1]
-        orderedItems += ItemOrder(name, items[itemIndex], buyAmounts[items[itemIndex]] ?: 0, unitPrice)
+
+        CraftFlipScript.orderedItems += ItemOrder(id, name, buyAmounts[items[itemIndex]] ?: 0, unitPrice)
         currState = State.NEXT_ITEM
       }
 
@@ -150,7 +155,7 @@ class BuyOrderState(
         itemIndex++
 
         if (itemIndex >= items.size) {
-          CraftFlipScript.changeState(ClaimItemState(flip, orderedItems))
+          CraftFlipScript.changeState(ClaimItemState(flip))
           return
         }
 

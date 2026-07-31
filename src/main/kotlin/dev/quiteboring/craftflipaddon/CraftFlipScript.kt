@@ -5,6 +5,7 @@ import dev.quiteboring.craftflipaddon.failsafe.LeaveSkyblockFailsafe
 import dev.quiteboring.craftflipaddon.state.find.FindFlipState
 import dev.quiteboring.craftflipaddon.util.SkyblockUtils
 import dev.quiteboring.craftflipaddon.util.helper.BuffState
+import dev.quiteboring.craftflipaddon.util.helper.ItemOrder
 import kotlin.random.Random
 import org.cobalt.event.annotation.SubscribeEvent
 import org.cobalt.event.impl.PacketEvent
@@ -92,6 +93,7 @@ object CraftFlipScript : Script(
 
   var chosenFlip: FlipData.FlipProduct? = null
   var amountToCraft: Int = 0
+  val orderedItems = mutableListOf<ItemOrder>()
   val blacklistedFlips = mutableSetOf<String>()
 
   override fun onEnable() {
@@ -103,6 +105,7 @@ object CraftFlipScript : Script(
 
     chosenFlip = null
     amountToCraft = 0
+    orderedItems.clear()
     globalDelay.schedule(1000)
     changeState(FindFlipState())
 
@@ -165,7 +168,7 @@ object CraftFlipScript : Script(
     state?.onPacketSend(event.packet)
   }
 
-  @SubscribeEvent()
+  @SubscribeEvent
   fun onPacketReceive(event: PacketEvent.Receive) {
     if (!enabled) {
       return
