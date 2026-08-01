@@ -1,7 +1,6 @@
 package dev.quiteboring.craftflipaddon.state.craft
 
 import dev.quiteboring.craftflipaddon.CraftFlipScript
-import dev.quiteboring.craftflipaddon.api.FlipData
 import dev.quiteboring.craftflipaddon.state.sell.SellOfferState
 import dev.quiteboring.craftflipaddon.util.interfaces.IAbstractSignEditScreen
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen

@@ -1,7 +1,6 @@
 package dev.quiteboring.craftflipaddon.state.sell
 
 import dev.quiteboring.craftflipaddon.CraftFlipScript
-import dev.quiteboring.craftflipaddon.api.FlipData
 import dev.quiteboring.craftflipaddon.state.find.FindFlipState
 import net.minecraft.world.inventory.ContainerInput
 import org.cobalt.module.impl.script.ScriptState

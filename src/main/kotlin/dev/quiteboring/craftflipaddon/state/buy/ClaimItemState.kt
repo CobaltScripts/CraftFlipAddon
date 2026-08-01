@@ -2,14 +2,12 @@ package dev.quiteboring.craftflipaddon.state.buy
 
 import dev.quiteboring.craftflipaddon.CraftFlipScript
 import dev.quiteboring.craftflipaddon.api.BazaarData
-import dev.quiteboring.craftflipaddon.api.FlipData
 import dev.quiteboring.craftflipaddon.state.craft.CraftState
 import dev.quiteboring.craftflipaddon.util.helper.OrderMode
 import net.minecraft.ChatFormatting
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ClientboundSystemChatPacket
 import net.minecraft.world.inventory.ContainerInput
-import org.cobalt.module.ModuleManager
 import org.cobalt.module.impl.script.ScriptState
 import org.cobalt.util.chat.ChatUtils
 import org.cobalt.util.client.PlayerUtils
@@ -52,7 +50,7 @@ class ClaimItemState : ScriptState() {
         }
 
         CraftFlipScript.scheduleGlobalDelay()
-        CraftFlipScript.changeState(RelistBuyState(flip, outdatedItem))
+        CraftFlipScript.changeState(RelistBuyState(outdatedItem))
       }
 
       State.OPEN_BAZAAR -> {
@@ -91,7 +89,7 @@ class ClaimItemState : ScriptState() {
         CraftFlipScript.scheduleGlobalDelay()
 
         if (scheduledItemsToClaim.isEmpty()) {
-          CraftFlipScript.changeState(CraftState(flip))
+          CraftFlipScript.changeState(CraftState())
         } else {
           currState = State.WAITING
         }
@@ -100,7 +98,7 @@ class ClaimItemState : ScriptState() {
       State.CLOSE_SCREEN -> {
         PlayerUtils.closeScreen()
         CraftFlipScript.scheduleGlobalDelay()
-        CraftFlipScript.changeState(CraftState(flip))
+        CraftFlipScript.changeState(CraftState())
       }
     }
   }

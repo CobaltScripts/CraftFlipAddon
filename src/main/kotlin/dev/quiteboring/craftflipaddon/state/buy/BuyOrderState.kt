@@ -1,7 +1,7 @@
 package dev.quiteboring.craftflipaddon.state.buy
 
 import dev.quiteboring.craftflipaddon.CraftFlipScript
-import dev.quiteboring.craftflipaddon.api.FlipData
+import dev.quiteboring.craftflipaddon.util.helper.ItemOrder
 import dev.quiteboring.craftflipaddon.util.interfaces.IAbstractSignEditScreen
 import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import net.minecraft.world.inventory.ContainerInput
@@ -12,7 +12,6 @@ import org.cobalt.util.chat.MessageType
 import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.inventory.ItemUtils
-import dev.quiteboring.craftflipaddon.util.helper.ItemOrder
 
 class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
 

@@ -1,7 +1,6 @@
 package dev.quiteboring.craftflipaddon.state.buy
 
 import dev.quiteboring.craftflipaddon.CraftFlipScript
-import dev.quiteboring.craftflipaddon.api.FlipData
 import dev.quiteboring.craftflipaddon.util.helper.ItemOrder
 import net.minecraft.world.inventory.ContainerInput
 import org.cobalt.module.impl.script.ScriptState
@@ -104,7 +103,7 @@ class RelistBuyState(val itemToRelist: ItemOrder) : ScriptState() {
         CraftFlipScript.scheduleGlobalDelay()
 
         val pair = Pair("${itemToRelist.id}:${itemToRelist.name}", amountToBuy)
-        CraftFlipScript.changeState(BuyOrderState(flip, mapOf(pair)))
+        CraftFlipScript.changeState(BuyOrderState(mapOf(pair)))
       }
     }
   }

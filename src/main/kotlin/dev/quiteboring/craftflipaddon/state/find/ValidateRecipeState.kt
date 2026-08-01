@@ -2,10 +2,8 @@ package dev.quiteboring.craftflipaddon.state.find
 
 import dev.quiteboring.craftflipaddon.CraftFlipScript
 import dev.quiteboring.craftflipaddon.api.BazaarData
-import dev.quiteboring.craftflipaddon.api.FlipData
 import dev.quiteboring.craftflipaddon.state.buy.BuyOrderState
 import dev.quiteboring.craftflipaddon.util.SearchUtils
-import net.minecraft.core.component.DataComponents
 import net.minecraft.world.inventory.ContainerInput
 import org.cobalt.module.impl.script.ScriptState
 import org.cobalt.util.chat.ChatUtils
@@ -14,7 +12,6 @@ import org.cobalt.util.client.PlayerUtils
 import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.inventory.ItemUtils
-import kotlin.collections.iterator
 
 class ValidateRecipeState : ScriptState() {
 

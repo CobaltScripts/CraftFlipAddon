@@ -15,11 +15,10 @@ public class AbstractSignEditScreenMixin implements IAbstractSignEditScreen {
 
   @Shadow
   @Final
-  private String[] messages;
-
+  protected SignBlockEntity sign;
   @Shadow
   @Final
-  protected SignBlockEntity sign;
+  private String[] messages;
 
   @Override
   public void craftflipaddon$setFirstMessage(@NonNull String message) {
