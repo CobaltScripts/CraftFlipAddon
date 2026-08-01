@@ -139,6 +139,10 @@ object CraftFlipScript : Script(
       return
     }
 
+    if (!SkyblockUtils.isInSkyblock) {
+      return
+    }
+
     state?.onTick()
   }
 
