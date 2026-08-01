@@ -8,7 +8,7 @@ import org.cobalt.util.chat.ChatUtils
 import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 
-class RelistSellState(val flip: FlipData.FlipProduct) : ScriptState() {
+class RelistSellState : ScriptState() {
 
   private var currState = State.OPEN_BAZAAR
   private var canceled = false
@@ -52,6 +52,7 @@ class RelistSellState(val flip: FlipData.FlipProduct) : ScriptState() {
           return
         }
 
+        val flip = CraftFlipScript.chosenFlip!!
         val slot = InventoryUtils.findItemInContainer("[SELL ${flip.name}]", true)
 
         if (slot == -1) {
@@ -86,7 +87,7 @@ class RelistSellState(val flip: FlipData.FlipProduct) : ScriptState() {
 
       State.INVOKE_SELL_ORDER -> {
         CraftFlipScript.scheduleGlobalDelay()
-        CraftFlipScript.changeState(SellOfferState(flip))
+        CraftFlipScript.changeState(SellOfferState())
       }
     }
   }

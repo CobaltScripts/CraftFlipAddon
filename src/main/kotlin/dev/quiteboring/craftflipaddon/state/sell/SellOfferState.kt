@@ -12,7 +12,7 @@ import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.inventory.ItemUtils
 
-class SellOfferState(val flip: FlipData.FlipProduct) : ScriptState() {
+class SellOfferState : ScriptState() {
 
   private var currState = State.OPEN_BAZAAR
   private var unitPrice = 0.0
@@ -37,6 +37,7 @@ class SellOfferState(val flip: FlipData.FlipProduct) : ScriptState() {
       }
 
       State.CLICK_ITEM -> {
+        val flip = CraftFlipScript.chosenFlip!!
         val slot = InventoryUtils.findItemInInventory(flip.name.lowercase())
 
         if (slot == -1) {
@@ -110,7 +111,7 @@ class SellOfferState(val flip: FlipData.FlipProduct) : ScriptState() {
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
         CraftFlipScript.scheduleGlobalDelay()
-        CraftFlipScript.changeState(ClaimCoinState(flip, unitPrice))
+        CraftFlipScript.changeState(ClaimCoinState(unitPrice))
       }
     }
   }

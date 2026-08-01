@@ -18,10 +18,7 @@ import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.scheduling.Clock
 
-class ClaimCoinState(
-  val flip: FlipData.FlipProduct,
-  val unitPrice: Double
-) : ScriptState() {
+class ClaimCoinState(val unitPrice: Double) : ScriptState() {
 
   private var currState = State.WAITING
   private val relistDelay = Clock()
@@ -35,6 +32,8 @@ class ClaimCoinState(
       return
     }
 
+    val flip = CraftFlipScript.chosenFlip!!
+
     when (currState) {
       State.WAITING -> {
         if (!relistDelay.passed()) {
@@ -46,7 +45,7 @@ class ClaimCoinState(
         }
 
         CraftFlipScript.scheduleGlobalDelay()
-        CraftFlipScript.changeState(RelistSellState(flip))
+        CraftFlipScript.changeState(RelistSellState())
       }
 
       State.OPEN_BAZAAR -> {

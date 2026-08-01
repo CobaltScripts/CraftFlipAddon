@@ -28,7 +28,7 @@ class FindFlipState : ScriptState() {
       return
     }
 
-    CraftFlipScript.changeState(ValidateRecipeState(flip))
+    CraftFlipScript.changeState(ValidateRecipeState())
   }
 
 }

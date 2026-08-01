@@ -93,6 +93,7 @@ object CraftFlipScript : Script(
 
   var chosenFlip: FlipData.FlipProduct? = null
   var amountToCraft: Int = 0
+
   val orderedItems = mutableListOf<ItemOrder>()
   val blacklistedFlips = mutableSetOf<String>()
 

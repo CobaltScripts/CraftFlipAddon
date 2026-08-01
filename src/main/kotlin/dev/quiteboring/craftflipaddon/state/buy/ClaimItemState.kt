@@ -17,9 +17,7 @@ import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.scheduling.Clock
 
-class ClaimItemState(
-  val flip: FlipData.FlipProduct
-) : ScriptState() {
+class ClaimItemState : ScriptState() {
 
   private var currState = State.WAITING
   private val scheduledItemsToClaim = mutableListOf<ClaimItem>()

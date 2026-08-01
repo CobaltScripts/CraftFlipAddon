@@ -11,9 +11,9 @@ import org.cobalt.util.chat.ChatUtils
 import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 
-class CraftState(val flip: FlipData.FlipProduct) : ScriptState() {
+class CraftState : ScriptState() {
 
-  private val flipName = flip.name
+  private val flipName = CraftFlipScript.chosenFlip!!.name
   private var currState = State.SEND_COMMAND
 
   override fun onTick() {
@@ -85,7 +85,7 @@ class CraftState(val flip: FlipData.FlipProduct) : ScriptState() {
 
       State.EXIT_SCREEN -> {
         CraftFlipScript.scheduleGlobalDelay()
-        CraftFlipScript.changeState(SellOfferState(flip))
+        CraftFlipScript.changeState(SellOfferState())
       }
     }
   }

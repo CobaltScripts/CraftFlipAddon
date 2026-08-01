@@ -11,10 +11,7 @@ import org.cobalt.util.input.MouseButton
 import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.inventory.ItemUtils
 
-class RelistBuyState(
-  val flip: FlipData.FlipProduct,
-  val itemToRelist: ItemOrder
-) : ScriptState() {
+class RelistBuyState(val itemToRelist: ItemOrder) : ScriptState() {
 
   private var currState = State.OPEN_BAZAAR
   private var amountToBuy = 1

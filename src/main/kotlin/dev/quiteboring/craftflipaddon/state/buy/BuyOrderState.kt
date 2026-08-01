@@ -14,10 +14,7 @@ import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.inventory.ItemUtils
 import dev.quiteboring.craftflipaddon.util.helper.ItemOrder
 
-class BuyOrderState(
-  val flip: FlipData.FlipProduct,
-  val buyAmounts: Map<String, Int>
-) : ScriptState() {
+class BuyOrderState(val buyAmounts: Map<String, Int>) : ScriptState() {
 
   private val items = buyAmounts.keys.toList()
 
@@ -33,7 +30,7 @@ class BuyOrderState(
     }
 
     if (items.isEmpty()) {
-      CraftFlipScript.changeState(ClaimItemState(flip))
+      CraftFlipScript.changeState(ClaimItemState())
       return
     }
 
@@ -155,7 +152,7 @@ class BuyOrderState(
         itemIndex++
 
         if (itemIndex >= items.size) {
-          CraftFlipScript.changeState(ClaimItemState(flip))
+          CraftFlipScript.changeState(ClaimItemState())
           return
         }
 

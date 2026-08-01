@@ -16,7 +16,7 @@ import org.cobalt.util.inventory.InventoryUtils
 import org.cobalt.util.inventory.ItemUtils
 import kotlin.collections.iterator
 
-class ValidateRecipeState(val flip: FlipData.FlipProduct) : ScriptState() {
+class ValidateRecipeState : ScriptState() {
 
   private var currState = State.OPEN_RECIPE
   private val recipe = mutableMapOf<String, Int>()
@@ -26,6 +26,7 @@ class ValidateRecipeState(val flip: FlipData.FlipProduct) : ScriptState() {
       return
     }
 
+    val flip = CraftFlipScript.chosenFlip!!
     val player = minecraft.player ?: return
     val screen = minecraft.gui.screen()
 
@@ -109,7 +110,7 @@ class ValidateRecipeState(val flip: FlipData.FlipProduct) : ScriptState() {
         PlayerUtils.closeScreen()
         CraftFlipScript.scheduleGlobalDelay()
         ChatUtils.sendSystemMessage("Chosen Flip: ${flip.id}", MessageType.DEBUG)
-        CraftFlipScript.changeState(BuyOrderState(flip, genBuyAmounts()))
+        CraftFlipScript.changeState(BuyOrderState(genBuyAmounts()))
       }
     }
   }
