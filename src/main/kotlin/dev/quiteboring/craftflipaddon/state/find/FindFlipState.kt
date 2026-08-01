@@ -8,8 +8,7 @@ import org.cobalt.module.impl.script.ScriptState
 class FindFlipState : ScriptState() {
 
   override fun enter() {
-    CraftFlipScript.chosenFlip =
-      FlipData.findProduct("ENCHANTED_NETHER_STALK") // TODO: change back to FlipData.findFlip()
+    CraftFlipScript.chosenFlip = FlipData.findFlip()
   }
 
   override fun onTick() {
