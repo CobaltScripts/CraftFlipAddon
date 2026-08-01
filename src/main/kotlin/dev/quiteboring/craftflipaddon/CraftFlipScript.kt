@@ -177,6 +177,10 @@ object CraftFlipScript : Script(
     state?.onPacketReceive(event.packet)
   }
 
+  fun scheduleGlobalDelay(delay: Long = genDelay()) {
+    globalDelay.schedule(delay)
+  }
+
   fun genDelay(): Long {
     return Random.nextLong(500L, 700L)
   }

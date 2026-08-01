@@ -49,7 +49,7 @@ class BuyOrderState(
         val itemName = items[itemIndex].split(":")[1].lowercase()
 
         ChatUtils.sendCommand("bz $itemName")
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_ITEM
       }
 
@@ -62,7 +62,7 @@ class BuyOrderState(
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_BUY_ORDER
       }
 
@@ -74,7 +74,7 @@ class BuyOrderState(
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_CUSTOM_AMOUNT
       }
 
@@ -86,7 +86,7 @@ class BuyOrderState(
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.INPUT_CUSTOM_AMOUNT
       }
 
@@ -98,14 +98,14 @@ class BuyOrderState(
           return
         }
 
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         (screen as IAbstractSignEditScreen).`craftflipaddon$setFirstMessage`(amount.toString())
         currState = State.SUBMIT_CUSTOM_AMOUNT
       }
 
       State.SUBMIT_CUSTOM_AMOUNT -> {
         minecraft.gui.setScreen(null)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_TOP_ORDER
       }
 
@@ -126,7 +126,7 @@ class BuyOrderState(
         ChatUtils.sendSystemMessage("Unit Price: $unitPrice", MessageType.DEBUG)
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.FINISH_BUY_ORDER
       }
 
@@ -138,7 +138,7 @@ class BuyOrderState(
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
 
         val id = items[itemIndex].split(":")[0]
         val name = items[itemIndex].split(":")[1]
@@ -159,7 +159,7 @@ class BuyOrderState(
           return
         }
 
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.OPEN_BAZAAR
       }
     }

@@ -22,13 +22,14 @@ class RelistBuyState(
 
   override fun onTick() {
     val player = minecraft.player ?: return
+
     val screen = minecraft.gui.screen()
     val screenTitle = screen?.title?.string.orEmpty()
 
     when (currState) {
       State.OPEN_BAZAAR -> {
         ChatUtils.sendCommand("bz")
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_MANAGE_ORDERS
       }
 
@@ -40,19 +41,19 @@ class RelistBuyState(
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLAIM_ITEM
       }
 
       State.CLAIM_ITEM -> {
         if (screenTitle.startsWith("Order options", ignoreCase = true)) {
-          CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+          CraftFlipScript.scheduleGlobalDelay()
           canceled = true
           currState = State.CANCEL_ORDER
           return
         }
 
-        if (!screenTitle.startsWith("Co-op Bazaar Orders", ignoreCase = true)) {
+        if (!screenTitle.contains("Bazaar Orders", ignoreCase = true)) {
           return
         }
 
@@ -68,12 +69,12 @@ class RelistBuyState(
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
       }
 
       State.CANCEL_ORDER -> {
         if (screen != null && !screenTitle.startsWith("Order options", ignoreCase = true)) {
-          CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+          CraftFlipScript.scheduleGlobalDelay()
           currState = State.CLAIM_ITEM
           return
         }
@@ -92,18 +93,18 @@ class RelistBuyState(
         } ?: return
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
       }
 
       State.CLOSE_SCREEN -> {
         PlayerUtils.closeScreen()
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.INVOKE_BUY_ORDER
       }
 
       State.INVOKE_BUY_ORDER -> {
         CraftFlipScript.orderedItems.remove(itemToRelist)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
 
         val pair = Pair("${itemToRelist.id}:${itemToRelist.name}", amountToBuy)
         CraftFlipScript.changeState(BuyOrderState(flip, mapOf(pair)))

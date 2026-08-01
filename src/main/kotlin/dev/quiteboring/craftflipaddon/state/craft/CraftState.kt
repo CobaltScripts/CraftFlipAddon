@@ -26,7 +26,7 @@ class CraftState(val flip: FlipData.FlipProduct) : ScriptState() {
     when (currState) {
       State.SEND_COMMAND -> {
         ChatUtils.sendCommand("recipe ${flipName.lowercase()}")
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_ITEM
       }
 
@@ -38,7 +38,7 @@ class CraftState(val flip: FlipData.FlipProduct) : ScriptState() {
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.OPEN_SIGN
       }
 
@@ -50,7 +50,7 @@ class CraftState(val flip: FlipData.FlipProduct) : ScriptState() {
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.RIGHT, ContainerInput.PICKUP)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.INPUT_SIGN
       }
 
@@ -61,13 +61,13 @@ class CraftState(val flip: FlipData.FlipProduct) : ScriptState() {
 
         val amount = CraftFlipScript.amountToCraft.toString()
         (screen as IAbstractSignEditScreen).`craftflipaddon$setFirstMessage`(amount)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.EXIT_SIGN
       }
 
       State.EXIT_SIGN -> {
         minecraft.gui.setScreen(null)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_SUPERCRAFT
       }
 
@@ -79,12 +79,12 @@ class CraftState(val flip: FlipData.FlipProduct) : ScriptState() {
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.EXIT_SCREEN
       }
 
       State.EXIT_SCREEN -> {
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         CraftFlipScript.changeState(SellOfferState(flip))
       }
     }

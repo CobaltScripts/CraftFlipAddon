@@ -26,7 +26,7 @@ class ClaimItemState(
   private val relistDelay = Clock()
 
   override fun enter() {
-    relistDelay.schedule(5_000)
+    relistDelay.schedule(30_000)
   }
 
   override fun onTick() {
@@ -53,13 +53,13 @@ class ClaimItemState(
           return
         }
 
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         CraftFlipScript.changeState(RelistBuyState(flip, outdatedItem))
       }
 
       State.OPEN_BAZAAR -> {
         ChatUtils.sendCommand("bz")
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_MANAGE_ORDERS
       }
 
@@ -71,7 +71,7 @@ class ClaimItemState(
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLAIM_ITEM
       }
 
@@ -84,13 +84,13 @@ class ClaimItemState(
         val (item, slot) = itemAndSlot
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
 
         scheduledItemsToClaim.remove(item)
         CraftFlipScript.orderedItems.removeAll { it.name == item.name }
 
         PlayerUtils.closeScreen()
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
 
         if (scheduledItemsToClaim.isEmpty()) {
           CraftFlipScript.changeState(CraftState(flip))
@@ -101,7 +101,7 @@ class ClaimItemState(
 
       State.CLOSE_SCREEN -> {
         PlayerUtils.closeScreen()
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         CraftFlipScript.changeState(CraftState(flip))
       }
     }
@@ -114,8 +114,12 @@ class ClaimItemState(
 
     val text = packet.content.string
     val unformattedText = ChatFormatting.stripFormatting(text).orEmpty()
-    val match = regex.find(unformattedText) ?: return
 
+    if (unformattedText.contains(":")) {
+      return
+    }
+
+    val match = regex.find(unformattedText) ?: return
     val quantity = match.groupValues[1].replace(",", "").toInt()
     val itemName = match.groupValues[2]
 

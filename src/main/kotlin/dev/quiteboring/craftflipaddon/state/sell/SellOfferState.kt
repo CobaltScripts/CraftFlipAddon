@@ -17,13 +17,22 @@ class SellOfferState(val flip: FlipData.FlipProduct) : ScriptState() {
   private var currState = State.OPEN_BAZAAR
   private var unitPrice = 0.0
 
+  override fun enter() {
+    val screen = minecraft.gui.screen()
+    val screenTitle = screen?.title?.string.orEmpty()
+
+    if (screenTitle.contains("Bazaar", ignoreCase = true)) {
+      currState = State.CLICK_ITEM
+    }
+  }
+
   override fun onTick() {
     val player = minecraft.player ?: return
 
     when (currState) {
       State.OPEN_BAZAAR -> {
         ChatUtils.sendCommand("bz")
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_ITEM
       }
 
@@ -35,7 +44,7 @@ class SellOfferState(val flip: FlipData.FlipProduct) : ScriptState() {
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
 
         currState = if (CraftFlipScript.instaSellProduct) State.INSTASELL else State.CREATE_SELL_OFFER
       }
@@ -48,13 +57,13 @@ class SellOfferState(val flip: FlipData.FlipProduct) : ScriptState() {
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLOSE_CONTAINER
       }
 
       State.CLOSE_CONTAINER -> {
         PlayerUtils.closeScreen()
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         CraftFlipScript.changeState(FindFlipState())
       }
 
@@ -66,7 +75,7 @@ class SellOfferState(val flip: FlipData.FlipProduct) : ScriptState() {
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_BEST_OFFER
       }
 
@@ -87,7 +96,7 @@ class SellOfferState(val flip: FlipData.FlipProduct) : ScriptState() {
         ChatUtils.sendSystemMessage("Unit Price: $unitPrice", MessageType.DEBUG)
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.FINISH_SELL_ORDER
       }
 
@@ -100,7 +109,7 @@ class SellOfferState(val flip: FlipData.FlipProduct) : ScriptState() {
         }
 
         InventoryUtils.clickSlot(slot, MouseButton.MIDDLE, ContainerInput.CLONE)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         CraftFlipScript.changeState(ClaimCoinState(flip, unitPrice))
       }
     }

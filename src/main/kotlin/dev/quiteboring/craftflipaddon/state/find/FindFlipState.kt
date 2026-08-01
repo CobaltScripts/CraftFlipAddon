@@ -20,7 +20,7 @@ class FindFlipState : ScriptState() {
 
     if (flip == null) {
       CraftFlipScript.chosenFlip = FlipData.findFlip(true)
-      CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+      CraftFlipScript.scheduleGlobalDelay()
       return
     }
 

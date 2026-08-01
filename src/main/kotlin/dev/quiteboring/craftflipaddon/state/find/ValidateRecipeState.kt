@@ -40,7 +40,7 @@ class ValidateRecipeState(val flip: FlipData.FlipProduct) : ScriptState() {
           return
         }
 
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.CLICK_PRODUCT
       }
 
@@ -68,7 +68,7 @@ class ValidateRecipeState(val flip: FlipData.FlipProduct) : ScriptState() {
         val loreLines = ItemUtils.getLoreLines(menu.slots[craftSlot].item)
 
         if (loreLines.any { it.string.contains("Recipe not unlocked!", ignoreCase = true) }) {
-          CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+          CraftFlipScript.scheduleGlobalDelay()
           currState = State.INVOKE_REFIND
           return
         }
@@ -83,7 +83,7 @@ class ValidateRecipeState(val flip: FlipData.FlipProduct) : ScriptState() {
           val id = SearchUtils.getProductId(itemStack)
 
           if (id == null || BazaarData.getProduct(id) == null) {
-            CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+            CraftFlipScript.scheduleGlobalDelay()
             currState = State.INVOKE_REFIND
             return
           }
@@ -94,20 +94,20 @@ class ValidateRecipeState(val flip: FlipData.FlipProduct) : ScriptState() {
           recipe[key] = (recipe[key] ?: 0) + itemStack.count
         }
 
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         currState = State.START_BUY_ORDER
       }
 
       State.INVOKE_REFIND -> {
         PlayerUtils.closeScreen()
         CraftFlipScript.blacklistedFlips.add(flip.id)
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         CraftFlipScript.changeState(FindFlipState())
       }
 
       State.START_BUY_ORDER -> {
         PlayerUtils.closeScreen()
-        CraftFlipScript.globalDelay.schedule(CraftFlipScript.genDelay())
+        CraftFlipScript.scheduleGlobalDelay()
         ChatUtils.sendSystemMessage("Chosen Flip: ${flip.id}", MessageType.DEBUG)
         CraftFlipScript.changeState(BuyOrderState(flip, genBuyAmounts()))
       }
